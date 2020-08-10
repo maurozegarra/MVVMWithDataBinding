@@ -1,31 +1,36 @@
 package com.maurozegarra.example.mvvmwithdatabinding
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.maurozegarra.example.mvvmwithdatabinding.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainPresenter.View {
+    private val presenter = MainPresenter(this, lifecycleScope)
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         with(binding) {
             button.setOnClickListener {
-                lifecycleScope.launch {
-                    progress.visibility = View.VISIBLE
-                    message.text = withContext(Dispatchers.IO) {
-                        Thread.sleep(2_000)
-                        if (user.text.isNotEmpty() && pass.text.isNotEmpty()) "Success" else "Failure"
-                    }
-                    progress.visibility = View.GONE
-                }
+                presenter.onButtonClicked(user.text.toString(), pass.text.toString())
             }
         }
+    }
+
+    override fun setProgressVisible(boolean: Boolean) {
+        if (boolean) {
+            binding.progress.visibility =
+                android.view.View.VISIBLE
+        } else {
+            binding.progress.visibility = android.view.View.GONE
+        }
+    }
+
+    override fun setMessage(message: String) {
+        binding.message.text = message
     }
 }
