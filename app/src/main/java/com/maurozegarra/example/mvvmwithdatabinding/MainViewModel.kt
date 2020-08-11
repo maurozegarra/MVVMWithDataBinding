@@ -14,6 +14,10 @@ class MainViewModel : ViewModel() {
     val progressVisibility: LiveData<Boolean>
         get() = _progressVisibility
 
+    init {
+        _progressVisibility.value = false
+    }
+
     private val _message = MutableLiveData<String>()
     val message: LiveData<String>
         get() = _message
